@@ -6,7 +6,7 @@ import java.util.List;
 import board.Coord;
 
 public class Route {
-	List<Coord> coords = new ArrayList<>();
+	private List<Coord> coords = new ArrayList<>();
 	public int destN;
 	public final Coord origin;
 	
@@ -47,5 +47,10 @@ public class Route {
 	
 	public int index(){
 		return coords.size();
+	}
+
+	public List<Coord> getAll() {
+		List<Coord> c = new ArrayList<>(coords); c.add(0, origin);
+		return c;
 	}
 }

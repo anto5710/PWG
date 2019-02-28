@@ -18,58 +18,72 @@ public class InfiniteMove extends GeneralMove {
 	
 	@Override
 	public Route findRoute(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c) {
-		return findRoutes(game,route,cur, move, c,false);
+		route.destN=0;
+		return findRoutes(game,route,cur, move,c,false);
 	}
+	
+//	public Route findRoute(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c, boolean isDest) {
+//		int i = route.index()%move.length;
+//		cur = cur.move(move[i]);
+//		
+////		boolean isDest = route.destN > 0;
+//		
+//		int state = Strider.condize(game.onBoard(cur)); 
+//		
+//		if(state!=Strider.FAILURE){
+//			if(isDest){
+//				state *= c.canBeDest(game, cur, route.origin);
+//			} else {
+//				state *= c.canBePass(game, cur, route.origin);
+//			}		
+//		}	
+//		
+//		if(state == Strider.FAILURE){
+//			return isDest ? route : null;
+//			
+//		}
+//		route.addCoord(cur);
+//		
+//		if(state==Strider.COMPLETE){
+//			if(isDest) return route;
+//				
+//			route.plusDest();
+//		}
+//		return findRoutes(game, route, cur, move, c, isDest);
+//	}
 	
 	public Route findRoutes(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c, boolean isDest) {
 		int i = route.index()%move.length;
-		
 		cur = cur.move(move[i]);
 		
-		int state = Strider.CONTINUE;
+		int state = Strider.condize(game.onBoard(cur));
 		if(move.length<=1){
 			isDest = true;
-		}
-		
-		if(!game.onBoard(cur)){
-			if(!isDest) return null;
-			
-			return route.destN==0? null : route;
-		}
-		
-
-		if(!isDest){
-			state *= c.canBePass(game, cur, route.origin);
-			
-			
-		
-		}else{
-			state *= c.canBeDest(game, cur, route.origin);
-			
-			if(state!=Strider.FAILURE){
-				route.destN++;
+		}		
+		if(state!=Strider.FAILURE){
+			if(!isDest){
+				state *= c.canBePass(game, cur, route.origin);	
+			}else{
+				state *= c.canBeDest(game, cur, route.origin);		
 			}
 		}
 		
 		if(state == Strider.FAILURE){
-			return isDest? route : null;
+			return route.destN==0? null : route;
 		}
 		
 		route.addCoord(cur);
+		if(isDest) route.plusDest();
 		
-		if(state==Strider.COMPLETE ){
-			if(!isDest){
-				isDest = true;
-				route.destN = 0;
-			}else{
+		if(state==Strider.COMPLETE){
+			if(isDest){
 				return route;
 			}
-			System.out.println(cur.x + ", " + cur.y);
+			
+			isDest = true;
+			route.destN = 0;				
 		}
 
-		
-		
 		return findRoutes(game, route, cur, move, c, isDest);
 	}
-	
 }

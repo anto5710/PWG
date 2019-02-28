@@ -3,10 +3,11 @@ package board;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+
 
 import board.Pieces.Pieces;
 import board.Pieces.iPiece;
@@ -64,6 +65,10 @@ public class Shogi {
 	}
 	
 	public boolean check(Team team){
+		return check(team, pieces);
+	}
+	
+	private boolean check(Team team, iPiece[][] pieces){
 		Coord king = king(team);
 		if(king==null) return false;
 		
@@ -79,15 +84,15 @@ public class Shogi {
 		return false;
 	}
 	
-	
+
 	
 	private static final String formation = 
 			"車馬象士+士象馬車"+","+
 			"++++王++++"+","+
 			"+砲+++++砲+"+","+
 			"卒+卒+卒+卒+卒"+","+
-			"+++++++++"+","+
-			"+++++++++"+","+
+			"+卒+卒+卒+卒+"+","+
+			"+卒+卒+卒+卒+"+","+
 			"卒+卒+卒+卒+卒"+","+
 			"+砲+++++砲+"+","+
 			"++++王++++"+","+
@@ -109,24 +114,27 @@ public class Shogi {
 	
 
 	public boolean move(int xi, int yi, int xf, int yf){
-		if(!canMoveTo(xi, yi, xf, yf)) return false;
-	
-		iPiece pieceMove = pieces[xi][yi];
-		iPiece pieceAbr = pieces[xf][yf];
-	
-		pieces[xf][yf] = pieceMove;
-		pieces[xi][yi] = null;
+		if(!canMoveTo(xi, yi, xf, yf)) return false;	
 		
-		if(check(pieceMove.getTeam())){
-			//undoes
-			pieces[xf][yf] = pieceAbr;
-			pieces[xi][yi] = pieceMove;
+		
+		iPiece toMove = pieces[xi][yi];
+		iPiece abg = pieces[xf][yf];
+		pieces[xf][yf] = toMove;
+		pieces[xi][yi] = null;
+	
+		
+		if(check(get(xf, yf).getTeam(), pieces)){
+			pieces[xf][yf] = abg;
+			pieces[xi][yi] = toMove;
 			return false;
 		}
 		
 		next();
 		return true;
 	}
+	
+	
+	
 	
 	public boolean anyInRoute(int xi, int yi, Predicate<Route> condition){
 		iPiece piece = pieces[xi][yi];
@@ -135,9 +143,21 @@ public class Shogi {
 		List<Route> routes = piece.findRoutes(this, xi, yi);
 		return routes.stream().filter(condition).count()>0;
 	}
-	
+		
 	public boolean canMoveTo(int xi, int yi, int xf, int yf){
 		return anyInRoute(xi, yi, r->r.isDest(xf, yf));
+	}
+	
+	public boolean canMoveToAnyWhere(int xi, int yi){
+		iPiece piece = pieces[xi][yi];
+		if(piece==null) return false;
+		
+		for(Route r : piece.findRoutes(this, xi, yi)){
+			if(r.getDests().stream().filter(c->canMoveTo(xi, yi, c.x, c.y)).count()>0){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public boolean onRouteOf(Coord pieceLoc, Coord point){
@@ -154,7 +174,7 @@ public class Shogi {
 			for(int x=0; x<rows[y].length(); x++){
 				String symbol = ""+rows[y].charAt(x);
 				if(!symbol.equals("+")){
-					Team team = y>center[1]? (Team) castles.keySet().toArray()[1]:(Team) castles.keySet().toArray()[0];
+					Team team = y>center[1]? teams[0]:teams[1];
 					iPiece p = Pieces.castFromSymbol(symbol, team);;
 					System.out.println(symbol+"  "+ x+" "+y+ "  "+p);
 					
