@@ -3,6 +3,8 @@ package board;
 import java.util.ArrayList;
 import java.util.List;
 
+import ui.Util;
+
 public class Coord {
 	public final int x,y ;
 	
@@ -22,6 +24,16 @@ public class Coord {
 		
 		Coord c = (Coord) obj;
 		return c.x == x && c.y == y;
+	}
+	
+	public double slope(Coord c){
+		if(c.x==x) return (c.y-y>0)? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+		
+		return (c.y - y)/(c.x - x); 
+	}
+	
+	public boolean between(Coord c1, Coord c2){
+		return Util.between(c1.x, x, c2.x) && Util.between(c1.y, y, c2.y);
 	}
 	
 	public List<Coord> squareRange(double margin){

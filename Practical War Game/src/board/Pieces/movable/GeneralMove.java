@@ -49,7 +49,7 @@ public abstract class GeneralMove extends AbstractPiece{
 	public final List<Route> findRoutes(Shogi game, Coord origin) {	
 		List<Route> routes = new ArrayList<>();
 		
-		System.out.println("size: "+ moves.keySet().size());
+//		System.out.println("size: "+ moves.keySet().size());
 		for(Coord [] move : moves.keySet()){
 			Route r = findRoute(game, new Route(origin), origin, move, moves.get(move));
 			if(r!=null) 

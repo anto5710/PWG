@@ -16,7 +16,8 @@ import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.border.Border;
 
-import ui.Renderer.GamePanel;
+import ui.Renderer.TraditionalBoard;
+import ui.Renderer.VisualBoard;
 
 
 
@@ -24,7 +25,7 @@ import ui.Renderer.GamePanel;
 public class MainFrame {
 
 	private JFrame frame;
-	private GamePanel randerer;
+	private TraditionalBoard randerer;
 
 	/**
 	 * Launch the application.
@@ -62,9 +63,10 @@ public class MainFrame {
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		
-		randerer = new GamePanel();
+		randerer = new TraditionalBoard();
 
 		frame.getContentPane().add(randerer, BorderLayout.CENTER);
+		
 		
 	}
 }

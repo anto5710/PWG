@@ -8,7 +8,7 @@ import board.Pieces.ChessPieces.Chariot;
 import board.Pieces.ChessPieces.Elephant;
 import board.Pieces.ChessPieces.Horse;
 import board.Pieces.ChessPieces.King;
-import board.Pieces.ChessPieces.Kingsman;
+import board.Pieces.ChessPieces.Tactician;
 import board.Pieces.ChessPieces.Private;
 
 public enum Pieces {
@@ -16,7 +16,7 @@ public enum Pieces {
 	CHARIOT("車", Chariot.class),
 	ELEPHANT("象", Elephant.class),
 	CANNON("砲", Cannon.class),
-	KINGSMAN("士", Kingsman.class),
+	TACTICIAN("士", Tactician.class),
 	KING("王", King.class),
 	PRIVATE("卒", Private.class);
 	
@@ -27,6 +27,11 @@ public enum Pieces {
 	private Pieces(String symbol, Class <? extends iPiece> pieceClass){
 		this.symbol = symbol;
 		this.pieceClass = pieceClass;
+	}
+	
+	@Override
+	public String toString() {
+		return symbol;
 	}
 	
 	public String getSymbol() {
@@ -59,14 +64,9 @@ public enum Pieces {
 		return null;
 	}
 	
-//	public static String getSymbol(Class<? extends AbstractPiece> class1) {
-//		for(Pieces c : Pieces.values()){
-//			if(c.pieceClass.equals(class1)){
-//				return c.symbol;
-//			}
-//		}
-//		return null;
-//	}
-//	
+	public static Pieces random(){
+		return values()[(int) (Math.random()*values().length)];	
+	}
+	
 	
 }

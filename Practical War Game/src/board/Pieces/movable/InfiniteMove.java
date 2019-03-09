@@ -19,40 +19,10 @@ public class InfiniteMove extends GeneralMove {
 	@Override
 	public Route findRoute(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c) {
 		route.destN=0;
-		return findRoutes(game,route,cur, move,c,false);
+		return findRoute(game,route,cur, move,c,false);
 	}
 	
-//	public Route findRoute(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c, boolean isDest) {
-//		int i = route.index()%move.length;
-//		cur = cur.move(move[i]);
-//		
-////		boolean isDest = route.destN > 0;
-//		
-//		int state = Strider.condize(game.onBoard(cur)); 
-//		
-//		if(state!=Strider.FAILURE){
-//			if(isDest){
-//				state *= c.canBeDest(game, cur, route.origin);
-//			} else {
-//				state *= c.canBePass(game, cur, route.origin);
-//			}		
-//		}	
-//		
-//		if(state == Strider.FAILURE){
-//			return isDest ? route : null;
-//			
-//		}
-//		route.addCoord(cur);
-//		
-//		if(state==Strider.COMPLETE){
-//			if(isDest) return route;
-//				
-//			route.plusDest();
-//		}
-//		return findRoutes(game, route, cur, move, c, isDest);
-//	}
-	
-	public Route findRoutes(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c, boolean isDest) {
+	public Route findRoute(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c, boolean isDest) {
 		int i = route.index()%move.length;
 		cur = cur.move(move[i]);
 		
@@ -60,6 +30,7 @@ public class InfiniteMove extends GeneralMove {
 		if(move.length<=1){
 			isDest = true;
 		}		
+		
 		if(state!=Strider.FAILURE){
 			if(!isDest){
 				state *= c.canBePass(game, cur, route.origin);	
@@ -84,6 +55,6 @@ public class InfiniteMove extends GeneralMove {
 			route.destN = 0;				
 		}
 
-		return findRoutes(game, route, cur, move, c, isDest);
+		return findRoute(game, route, cur, move, c, isDest);
 	}
 }

@@ -13,7 +13,7 @@ public class XVault extends Vaultable{
 	
 	@Override
 	public int canBeDest(Shogi game, Coord to, Coord origin) {
-		int castle = condize(game.inCastle(origin) && game.inCastle(to));
+		int castle = condize(game.onADiagonal(to, origin));
 		return super.canBeDest(game, to, origin) * castle;
 	}
 
