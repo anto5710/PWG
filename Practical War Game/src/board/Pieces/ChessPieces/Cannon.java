@@ -3,6 +3,7 @@ package board.Pieces.ChessPieces;
 import board.Team;
 import board.Pieces.Pieces;
 import board.Pieces.condition.Vaultable;
+import board.Pieces.condition.Xseries.XVault;
 import board.Pieces.movable.InfiniteMove;
 
 
@@ -15,7 +16,7 @@ public class Cannon extends InfiniteMove {
 	public Cannon(Team team) {
 		super(Pieces.CANNON, team);
 		addGeneralMoves(new Vaultable(this), d1, d2);
-		addGeneralMoves(new Vaultable(this), dd1, dd2);
+		addGeneralMoves(new XVault(this), dd1, dd2);
 	}
 
 

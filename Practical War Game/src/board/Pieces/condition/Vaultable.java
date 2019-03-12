@@ -27,7 +27,7 @@ public class Vaultable extends Strider{
 		
 		if(target==null) return CONTINUE;
 		
-		if(target.sameTeam(piece)) return FAILURE;
+		if(target.sameTeam(piece) || target instanceof Cannon) return FAILURE;
 		
 		return COMPLETE;
 	}

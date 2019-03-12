@@ -1,9 +1,11 @@
 package board.Pieces.ChessPieces;
 
+
 import board.Team;
 import board.Pieces.Pieces;
+
 import board.Pieces.condition.Unrecedable;
-import board.Pieces.condition.XCross;
+import board.Pieces.condition.Xseries.XStrider;
 import board.Pieces.movable.FiniteMove;
 
 public class Private extends FiniteMove{
@@ -15,7 +17,7 @@ public class Private extends FiniteMove{
 	public Private(Team team) {
 		super(Pieces.PRIVATE, team);
 		addGeneralMoves(new Unrecedable(this), d1, d2);
-		addGeneralMoves(new XCross(this), dd1, dd2);
+		addGeneralMoves(new XStrider(this), dd1, dd2);
 	}
 	
 }

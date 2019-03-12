@@ -28,7 +28,7 @@ public class Strider implements iRouteCondition{
 	/*
 	 * stands for conditionize, tranfering boolean to int condition
 	 */
-	public int condize(boolean result){
+	public static int condize(boolean result){
 		return result? CONTINUE:FAILURE;
 	}
 }
