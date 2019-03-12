@@ -1,10 +1,9 @@
-package board.Pieces.condition.Xseries;
+package board.Pieces.condition;
 
 
 import board.Coord;
 import board.Shogi;
 import board.Pieces.iPiece;
-import board.Pieces.condition.CastleDweller;
 
 public class XCross extends CastleDweller{
 

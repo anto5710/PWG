@@ -1,7 +1,5 @@
 package board;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class Coord {
 	public final int x,y ;
@@ -24,31 +22,23 @@ public class Coord {
 		return c.x == x && c.y == y;
 	}
 	
-	public List<Coord> squareRange(double margin){
-		List<Coord> coords = new ArrayList<>();
-		for(double dx=-margin; dx<=margin; dx+=margin){
-			for(double dy=-margin; dy<=margin; dy+=margin){
-				Coord cur = new Coord((int)Math.round(dx+x), (int)Math.round(dy+y));
-				
-				if(!coords.contains(cur)){ 
-					coords.add(cur);
-				}
-			}
-		}
-		return coords;
+	public static int[] move(int [] c1, int [] c2){
+		return move(c1[0], c1[1], c2[0], c2[1]);
 	}
 	
-	@Override
-	public String toString() {
-		return "("+x+", "+y+")";
-	}
-	
-	public Coord move(Coord delta){
-		return move(delta.x, delta.y);
-	}
-	
-	public Coord move(int dx, int dy){
+	public Coord move(Coord coord){
+		int dx = coord.x;
+		int dy =coord.y;
 		return new Coord(x+dx, y+dy);
+	}
+	
+	public static int[] move(int [] c1, int dx, int dy){
+		return move(c1[0], c1[1], dx, dy);	
+	}
+	
+	public static int[] move(int x, int y, int dx, int dy){
+		int []c3 = {x + dx, y + dy};
+		return c3;
 	}
 
 	public Coord multiply(int dx, int dy){

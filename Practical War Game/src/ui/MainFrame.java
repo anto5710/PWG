@@ -1,23 +1,11 @@
 package ui;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Insets;
 
-import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
 import javax.swing.JFrame;
-import javax.swing.border.Border;
-
-import ui.Renderer.GamePanel;
-
 
 
 
@@ -53,18 +41,15 @@ public class MainFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame("Practical War Game");
+		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
-		frame.setMinimumSize(new Dimension(400, 400));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setForeground(Color.WHITE);
-		
-		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		
+
+		frame.setLayout(new BorderLayout());
 		
 		randerer = new GamePanel();
-
-		frame.getContentPane().add(randerer, BorderLayout.CENTER);
+		frame.add(randerer, BorderLayout.CENTER);
 		
 	}
 }
