@@ -8,6 +8,7 @@ public class Strider implements iRouteCondition{
 	protected final iPiece piece;
 	public final static int CONTINUE= 1;
 	public final static int FAILURE = 0;
+	public final static int COMPLETE = 2;
 	
 	public Strider(iPiece piece) {
 		this.piece = piece;
@@ -21,13 +22,13 @@ public class Strider implements iRouteCondition{
 	@Override
 	public int canBeDest(Shogi game, Coord to, Coord origin) {
 		iPiece target = game.get(to);
-		return condize(target==null || target.getTeam() != piece.getTeam());
+		return condize(target==null || !piece.sameTeam(target));
 	}
 	
 	/*
 	 * stands for conditionize, tranfering boolean to int condition
 	 */
-	public int condize(boolean result){
+	public static int condize(boolean result){
 		return result? CONTINUE:FAILURE;
 	}
 }

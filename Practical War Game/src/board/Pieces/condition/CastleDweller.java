@@ -11,14 +11,14 @@ public class CastleDweller extends Strider{
 	}
 	
 	@Override
-	public int canBeDest(Shogi game, Coord to, Coord origin) {
-		int state = condize(game.inCastle(to));
-		return state * super.canBeDest(game, to, origin);
+	public int canBePass(Shogi game, Coord to, Coord origin) {
+		int state = condize(game.inCastle(piece.getTeam(), to));
+		return state * super.canBePass(game, to, origin);
 	}
 
 	@Override
-	public int canBePass(Shogi game, Coord to, Coord origin) {
-		int state = condize(game.inCastle(to));
-		return state * super.canBePass(game, to, origin);
+	public int canBeDest(Shogi game, Coord to, Coord origin) {
+		int state = condize(game.inCastle(piece.getTeam(), to));
+		return state * super.canBeDest(game, to, origin);
 	}
 }
