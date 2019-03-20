@@ -1,6 +1,5 @@
 package ui;
 
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -78,7 +77,6 @@ public class Util {
 		  }
 		  return jarFile.getParentFile();
 	}
-
 	
 	
 	public static Color blend(Color... c) {
@@ -106,8 +104,6 @@ public class Util {
 
 	    return new Color(a << 24 | r << 16 | g << 8 | b);
 	}
-	
-	
 	
 	public static int round(double num, double center){
 		int numI = (int)num;
@@ -166,7 +162,7 @@ public class Util {
 	}
 	
 	public static Polygon getNPolygon(double x, double y, int N, double xr, double yr){
-		Assert.test(N<=0, N+" sides? It's not a polygon you know?");
+		Assert.throwIF(N<=0, N+" sides? It's not a polygon you know?");
 		
 		int[]xs = new int[N];
 		int[]ys = new int[N];
@@ -205,9 +201,5 @@ public class Util {
 		fonts.put(f, f.getSize2D());
 		return f;
 	}
-	
-	
-	
+		
 }
-
-

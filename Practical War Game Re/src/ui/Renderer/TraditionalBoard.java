@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -68,39 +69,30 @@ public class TraditionalBoard extends RenderableBoard{
 				
 	
 	
-	private SoundPlayer player = new SoundPlayer();
+//	private SoundPlayer player = new SoundPlayer();
 	private SoundPlayer bgm = new SoundPlayer();
 	public TraditionalBoard(){
-		this(Formation.HEEH, teams);
+		this(Formation.HEEH_ROTATED, teams);
 		sizes.put(Pieces.PRIVATE, 0.8);
 		sizes.put(Pieces.TACTICIAN, 0.8);
 		sizes.put(Pieces.KING, 1.2);
+		
 		addMouseMotionListener(new MouseAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				whenMouseMoved(e);
 			}
 		});
-
-		
 		
 		addPieceListener(new PieceListener() {		
 			@Override
 			public void pieceMoved(PieceMoveEvent e) {
-				iPiece p = e.piece;
-				File sound = loader.getSoundWhen(p.getPClass(), p.getTeam().getName(), "place");
-				if(sound!=null){
-					new SoundPlayer().play(sound);
-					System.out.println("sdsdsd");
-				}
+				playEffect(e.piece, "place");		
 			}
-			
 			
 			@Override
 			public void pieceKilled(PieceMoveEvent e) {
-				iPiece p = e.piece;
-				File sound = loader.getSoundWhen(p.getPClass(), p.getTeam().getName(), "kill"); 
-				if(sound!=null) player.play(sound);	
+				playEffect(e.piece, "kill");
 			}
 		});
 		
@@ -108,26 +100,12 @@ public class TraditionalBoard extends RenderableBoard{
 			
 			@Override
 			public void check(TeamEvent e) {
-				if(now==null){
-					now=loader.check;
-				}else if(now!=loader.check) bgm.stop();
-				
-				if(loader.check!=null && now!=loader.check){
-					bgm.play(loader.check);
-					now = loader.check; 
-				}
+				changeBGM(loader.check);
 			}
 			
 			@Override
 			public void checkmate(TeamEvent e) {
-				if(now==null){
-					now=loader.check;
-				}else if(now!=loader.checkmate) bgm.stop();
-				
-				if(loader.checkmate!=null && now!=loader.checkmate){
-					bgm.play(loader.checkmate);
-					now = loader.checkmate;
-				}
+				changeBGM(loader.checkmate);
 			}
 
 			@Override
@@ -172,6 +150,7 @@ public class TraditionalBoard extends RenderableBoard{
 	}
 			
 	public void drawPiece(Graphics2D g, iPiece piece, int px, int py, int state){
+		
 		double scale = getSize(piece.getPClass());
 		
 		String symbol = piece.getPClass().getSymbol();		
@@ -202,10 +181,13 @@ public class TraditionalBoard extends RenderableBoard{
 		
 		if(state==MOVING) return;
 			
+		
+		// char bevel-in
 		updateFont(g, fs);
 		g.setColor(piece.getTeam().getColor().darker().darker());	
 		Util.drawStringJustified(g, symbol, px, py, fs);
 			
+		// char
 		updateFont(g, fsIN);
 		g.setColor(piece.getTeam().getColor());	
 		Util.drawStringJustified(g, symbol, px, py, fsIN);	
@@ -230,6 +212,20 @@ public class TraditionalBoard extends RenderableBoard{
 		if(pieceFocused()) repaint();
 	}
 	
+	private void changeBGM(File sound){
+		if(now!=null && now!=sound) bgm.stop();
+		
+		if(sound!=null && now!=sound){
+			bgm.play(sound);
+			now = sound; 
+		}
+	}
+	
+	private void playEffect(iPiece piece, String state){
+		File sound = loader.getSoundWhen(piece, state); 
+		if(sound!=null) new SoundPlayer().play(sound);
+	}
+	
 	@Override
 	public void renderRoutes(Graphics2D g){
 		iPiece piece = focusedPiece();
@@ -240,7 +236,7 @@ public class TraditionalBoard extends RenderableBoard{
 		for(Route r : routes){
 			g.setColor(COLOR_DEST);
 			for(Coord dest : r.getDests()){
-
+				
 				Point mouse = getMousePosition();
 				if(mouse!=null){
 					Coord mouseC = toCoord(mouse.x, mouse.y);
@@ -250,6 +246,8 @@ public class TraditionalBoard extends RenderableBoard{
 						drawPiece(g, piece, mouse.x, mouse.y, PREVIEW);
 					}
 				}
+				g.setColor(COLOR_PASS);
+				Util.fillCircleAtCenter(g, toPixel(dest), 10);
 			}
 			g.setStroke(new BasicStroke(3));
 			g.setColor(COLOR_PASS);

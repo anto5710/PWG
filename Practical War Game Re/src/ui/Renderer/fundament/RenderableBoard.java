@@ -38,6 +38,7 @@ public abstract class RenderableBoard extends PerspectiveBoard{
 				iPiece piece = game.get(x,y);
 				if(piece!=null){
 					int[]pixel = toPixel(x,y);
+					
 					drawPiece(g, piece, pixel[0], pixel[1], stateOf(piece));
 				}
 			}

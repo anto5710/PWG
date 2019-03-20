@@ -19,51 +19,36 @@ public class VisualBoard extends TraditionalBoard{
 	@Override
 	public void drawBackdrop(Graphics g) {
 		Team team = game.turn();
-		String bg = "default";
-		if(game.check(team)) bg = "check";
 		
-		if(game.checkmate(team)) bg = "checkmate";
-		
-		BufferedImage background = loader.getBackground(bg);
+		String status = game.getStatus(team).getName();
+		BufferedImage background = loader.getBackground(status);
 		if(background==null){
 			super.drawBackdrop(g); return;
 		}
-		
-		AffineTransform t = new AffineTransform();
-		int m = Math.min(background.getWidth(), background.getHeight());
-		int W= (int) (1D*boardLength()/m*background.getWidth());
-		int H= (int) (1D*boardLength()/m*background.getHeight());
-		
-		t.translate(tx()-(W-boardLength())/2, ty()- (H-boardLength())/2);
-		t.scale(1D*boardLength()/m, 1D*boardLength()/m);
-		
 		g.clipRect(tx(), ty(), boardLength(), boardLength());
-		((Graphics2D)g).drawImage(background, t, null);
+		renderImageAtCenter((Graphics2D) g, background, (int)Math.round(centerX()), (int)Math.round(centerY()), boardLength()/2);
 		g.setClip(null);
 	}
 	
-	public void drawPiece(Graphics2D g, iPiece piece, int px, int py, int state) {
-		
-//		if(!registered(piece)){
-//			super.drawPiece(g, piece, px, py, state); return;
-//		}
-//		
+	public void drawPiece(Graphics2D g, iPiece piece, int px, int py, int state) {	
+//		if(!registered(piece)){		
 		BufferedImage img = loader.getVisualOf(piece.getPClass(), piece.getTeam().getName());
 		if(img==null){
 			super.drawPiece(g, piece, px, py, state); return;
 		}
-		
-		renderImageAtCenter(g, img, px, py, szI(getSize(piece.getPClass())*piece_size));
+		int radius = szI(getSize(piece.getPClass())*piece_size);
+		renderImageAtCenter(g, img, px, py, radius);
 	};
 
 	public void renderImageAtCenter(Graphics2D g, BufferedImage img, int px, int py, int r){
 		AffineTransform t = new AffineTransform();
-		int m = Math.min(img.getWidth(), img.getHeight());
-		double cx = px-r;
-		double cy = py-(1D*r/m*img.getHeight());
+		
+		double min = Math.min(img.getWidth(), img.getHeight());
+		double cx = px-r/min*img.getWidth();
+		double cy = py-r/min*img.getHeight();
 		
 		t.translate(cx, cy);		
-		t.scale(2D*r/m, 2D*r/m);
+		t.scale(2D*r/min, 2D*r/min);
 		g.drawImage(img, t, null);
 	}
 }

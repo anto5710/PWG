@@ -25,7 +25,7 @@ public class ListeningBoard extends JPanel{
 	private List<GameListener> gameLs = new ArrayList<>();
 	
 	public ListeningBoard(Formation f, Team...teams) {
-		Assert.test(f==null || teams.length>4 || teams.length==0, "Invalid formation or invalid number of teams");
+		Assert.throwIF(f==null || teams.length>4 || teams.length==0, "Invalid formation or invalid number of teams");
 		game = new Shogi(f,teams);
 	}
 		

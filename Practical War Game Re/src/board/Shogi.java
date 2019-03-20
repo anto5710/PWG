@@ -1,8 +1,7 @@
 package board;
 
-import java.awt.Polygon;
 import java.util.ArrayList;
-
+import java.util.Arrays;
 import java.util.HashMap;
 
 import java.util.List;
@@ -17,7 +16,6 @@ import board.Pieces.iPiece;
 import board.Pieces.ChessPieces.King;
 import board.Pieces.condition.Route;
 import ui.Assert;
-import ui.Util;
 
 public class Shogi {
 	public final int tile_row, tile_column; //칸
@@ -40,7 +38,7 @@ public class Shogi {
 	 * 최대 4팀까지
 	 */
 	public Shogi(Formation formation, Team... teams) {
-		Assert.test(teams.length>4, "No more than 4 teams");
+		Assert.throwIF(teams.length>4, "No more than 4 teams");
 		
 		this.width = formation.W;
 		this.height = formation.H;
@@ -53,7 +51,7 @@ public class Shogi {
 
 		this.teams = teams;
 		nthTeam=0;
-		setCastles();
+//		setCastles();
 		formate(formation);
 	}
 	
@@ -71,11 +69,20 @@ public class Shogi {
 		this.teams = teams;
 		
 		nthTeam=0;
-		setCastles();
+//		setCastles();
 //		System.out.println(width + "d2 "+ height);
 		this.pieces = p;
 	}
 
+	public Status getStatus(Team team){
+		if(!castles.containsKey(team)) return null;
+		
+		if(check(team)){
+			return checkmate(team) ? Status.CHECKMATE : Status.CHECK;
+		}
+		return Status.NORMAL;
+	}
+	
 	private Coord findKing(Team team){
 		for(Coord c : getCastle(team).squareRange(1)){
 			iPiece p = pieces[c.x][c.y];
@@ -90,7 +97,6 @@ public class Shogi {
 	
 		return anyPiece((p,pLoc)-> !team.in(p) && onDest(pLoc.x, pLoc.y, king.x, king.y));
 	}
-	
 	
 	public boolean checkmate(Team team){
 		if(!check(team)) return false;
@@ -190,23 +196,33 @@ public class Shogi {
 			iPiece p = Pieces.castFromSymbol(meta.symbol, teams[meta.team]);
 			
 			pieces[c.x][c.y] = p;
+			if(p instanceof King){ 
+				setCastle(p.getTeam(), c);
+			}
 		}
 	}
+
+//	private void setCastles(){
+//		double xr = center[0] - 1;
+//		double yr = center[1] -1;		
+//	
+//		Polygon p = Util.getNPolygon(center[0], center[1], teams.length, xr, yr);
+//		for(int i=0; i<teams.length; i++){
+//			Coord castle = new Coord(p.xpoints[i], p.ypoints[i]);
+//			
+//			setCastle(teams[i], castle);
+//		}
+//	}
 	
-	private void setCastles(){
-		double xr = center[0] - 1;
-		double yr = center[1] -1;		
-	
-		Polygon p = Util.getNPolygon(center[0], center[1], teams.length, xr, yr);
-		for(int i=0; i<teams.length; i++){
-			Coord castle = new Coord(p.xpoints[i], p.ypoints[i]);
-			
-			castles.put(teams[i], castle);
+	private void setCastle(Team team, Coord castle) {
+		if(castle!=null && Arrays.asList(teams).contains(team)) {
+			System.out.println("castle" + team);
+			castles.put(team, castle);
 			addDiagonal(castle.move(1, 1), castle.move(-1, -1));
 			addDiagonal(castle.move(-1, 1), castle.move(1, -1));
 		}
 	}
-	
+
 	public void addDiagonal(Coord c1, Coord c2){
 		if(!onBoard(c1) || !onBoard(c2) || c1.equals(c2)) return;
 		

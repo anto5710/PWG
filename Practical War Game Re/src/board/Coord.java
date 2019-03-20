@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import ui.Assert;
 import ui.Util;
 
 public class Coord {
@@ -15,8 +16,9 @@ public class Coord {
 	}
 	
 	public Coord(int[]coord){
-		this(coord[0], coord[1]);
-		assert coord.length==2;
+		Assert.throwIF(coord==null || coord.length!=2, "Invalid Format for a Coord Instance. Only (x,y) is allowed");
+		this.x = coord[0];
+		this.y = coord[1];
 	}
 	
 	@Override

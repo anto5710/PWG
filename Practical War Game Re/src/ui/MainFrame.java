@@ -16,7 +16,7 @@ import ui.Renderer.VisualBoard;
 public class MainFrame {
 
 	private JFrame frame;
-	private TraditionalBoard randerer;
+	private TraditionalBoard board;
 
 	/**
 	 * Launch the application.
@@ -50,13 +50,12 @@ public class MainFrame {
 		frame.setMinimumSize(new Dimension(400, 400));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setForeground(Color.WHITE);
-		
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		
-		randerer = new VisualBoard();
+		board = new TraditionalBoard();
 
-		frame.getContentPane().add(randerer, BorderLayout.CENTER);
+		frame.getContentPane().add(board, BorderLayout.CENTER);
 		
 		
 	}

@@ -1,31 +1,29 @@
 package ui.Renderer;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import board.Status;
 import board.Team;
 import board.Pieces.Pieces;
+import board.Pieces.iPiece;
 import ui.Assert;
 import ui.FileExplorer;
 import ui.MainFrame;
 import ui.Util;
 
 public class AssetLoader {
-	private FileExplorer main_folder;
-	private FileExplorer skines_folder;
-	private FileExplorer background_folder;
-	private FileExplorer bgm_folder;
+	private FileExplorer main_folder, skines_folder, background_folder, bgm_folder;
 //	private FileExplorer sound_folder;
-	private Team[] teams;
+//	private Team[] teams;
 	
 	public File check, checkmate;
 	
-	
 	public AssetLoader(Team[]teams) {
-		Assert.test(teams==null, "loading dekinai");
-		this.teams = teams;
+		Assert.throwIF(teams==null, "loading dekinai");
 		
 		main_folder = new FileExplorer(Util.getJARdir(MainFrame.class)).goChild("PWG");
 		skines_folder = main_folder.goChild("pieces");
@@ -33,8 +31,7 @@ public class AssetLoader {
 		bgm_folder = main_folder.goChild("bgm");
 //		sound_folder = explorer.goChild("sound");
 		
-		loadSkins();
-//		loadSounds();
+		loadSkins(teams);
 		loadBackgrounds();
 		loadBGM();
 	}
@@ -47,22 +44,22 @@ public class AssetLoader {
 	private Map<String, SkinSet> skins = new HashMap<>();	
 	private Map<String, BufferedImage> backgrounds = new HashMap<>();
 
-	private String[] default_backgrounds = {"default", "check", "checkmate"};
 	private void loadBackgrounds(){
-		for(String name : default_backgrounds){
+		for(Status status : Status.values()){
+			String name = status.getName();
+			
 			BufferedImage bgIMG = background_folder.laodUnivImage(name);
 			if(bgIMG!=null) backgrounds.put(name, bgIMG);
 		}
 	}
 
-	private void loadSkins(){		
+	private void loadSkins(Team [] teams){		
 		for(Team team: teams){
 			FileExplorer skin = skines_folder.goChild(team.getName());
 			SkinSet set = get(team+"");
 			
 			for(Pieces p: Pieces.values()){
 				BufferedImage img = skin.laodUnivImage(p.getSymbol());
-				
 				set.register(p, img);
 			
 				SoundSet sound = loadSoundSet(skin.goChild(p+""));
@@ -100,14 +97,21 @@ public class AssetLoader {
 		
 		return set==null? null: set.getVisual(pclass);
 	}
+	
+	public File getSoundWhen(iPiece p, String state) {
+		String skin = p.getTeam().getName();
+		Pieces pclass = p.getPClass();
+		
+		SkinSet set = skins.get(skin);
+//		System.out.println(set.getSoundSet(pclass).sounds.size());
+		return set==null? null: set.getSoundSet(pclass).getSound(state);
+	}
 
 	public File getSoundWhen(Pieces pclass, String skin, String state){
 		SkinSet set = skins.get(skin);
 //		System.out.println(set.getSoundSet(pclass).sounds.size());
 		return set==null? null: set.getSoundSet(pclass).getSound(state);
 	}
-	
-	
 	
 	private class SoundSet{
 		private HashMap<String, File> sounds = new HashMap<>();
