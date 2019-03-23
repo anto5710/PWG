@@ -3,13 +3,10 @@ package board.Pieces.condition;
 import board.Coord;
 import board.Shogi;
 import board.Pieces.iPiece;
+import board.Pieces.movable.GeneralAction;
 
 public class Strider implements iRouteCondition{
 	protected final iPiece piece;
-	public final static int CONTINUE= 1;
-	public final static int FAILURE = 0;
-	public final static int COMPLETE = 2;
-	
 	public Strider(iPiece piece) {
 		this.piece = piece;
 	}
@@ -29,6 +26,6 @@ public class Strider implements iRouteCondition{
 	 * stands for conditionize, tranfering boolean to int condition
 	 */
 	public static int condize(boolean result){
-		return result? CONTINUE:FAILURE;
+		return result? GeneralAction.CONTINUE:GeneralAction.FAILURE;
 	}
 }

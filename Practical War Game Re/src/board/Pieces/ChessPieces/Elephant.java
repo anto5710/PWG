@@ -12,7 +12,7 @@ public class Elephant extends FiniteMove {
 	
 	public Elephant(Team team) {
 		super(Pieces.ELEPHANT, team);
-		addGeneralMoves(new Strider(this), d1, d2);
+		addGeneralActions(new Strider(this), d1, d2);
 	}
 
 }

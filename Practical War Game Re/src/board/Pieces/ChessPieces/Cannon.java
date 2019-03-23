@@ -15,8 +15,8 @@ public class Cannon extends InfiniteMove {
 	private static final int[][] dd2 = {{1,-1},{1,-1}};
 	public Cannon(Team team) {
 		super(Pieces.CANNON, team);
-		addGeneralMoves(new Vaultable(this), d1, d2);
-		addGeneralMoves(new XVault(this), dd1, dd2);
+		addGeneralActions(new Vaultable(this), d1, d2);
+		addGeneralActions(new XVault(this), dd1, dd2);
 	}
 
 

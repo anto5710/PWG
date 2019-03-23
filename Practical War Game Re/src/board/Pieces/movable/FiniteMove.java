@@ -5,10 +5,9 @@ import board.Shogi;
 import board.Team;
 import board.Pieces.Pieces;
 import board.Pieces.condition.Route;
-import board.Pieces.condition.Strider;
 import board.Pieces.condition.iRouteCondition;
 
-public class FiniteMove extends GeneralMove{
+public class FiniteMove extends GeneralAction{
 
 	public FiniteMove(Pieces pclass, Team team) {
 		super(pclass, team);
@@ -16,7 +15,7 @@ public class FiniteMove extends GeneralMove{
 	
 	public Route findRoute(Shogi game, Route route, Coord cur, Coord[]move, iRouteCondition c){
 		cur = cur.move(move[route.index()]);
-		int state = Strider.CONTINUE;
+		int state = GeneralAction.CONTINUE;
 		boolean isDest = route.index()==move.length-1;
 		
 		if(!game.onBoard(cur)) return null;
@@ -27,7 +26,7 @@ public class FiniteMove extends GeneralMove{
 			state *= c.canBePass(game, cur, route.origin);
 		}
 			
-		if(state == Strider.FAILURE){
+		if(state == GeneralAction.FAILURE){
 			return null;
 		}
 		route.addCoord(cur);

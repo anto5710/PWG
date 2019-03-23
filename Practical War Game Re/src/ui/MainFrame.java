@@ -53,7 +53,7 @@ public class MainFrame {
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		
-		board = new TraditionalBoard();
+		board = new VisualBoard();
 
 		frame.getContentPane().add(board, BorderLayout.CENTER);
 		

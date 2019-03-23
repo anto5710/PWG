@@ -16,8 +16,8 @@ public class Chariot extends InfiniteMove{
 	
 	public Chariot(Team team) {
 		super(Pieces.CHARIOT, team);
-		addGeneralMoves(new Striker(this), d1, d2);
-		addGeneralMoves(new XStriker(this), dd1, dd2);
+		addGeneralActions(new Striker(this), d1, d2);
+		addGeneralActions(new XStriker(this), dd1, dd2);
 	}
 }
 

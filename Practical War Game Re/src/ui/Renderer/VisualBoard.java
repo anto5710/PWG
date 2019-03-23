@@ -3,17 +3,78 @@ package ui.Renderer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
+
 import board.Team;
 import board.Pieces.iPiece;
+import ui.SoundPlayer;
+import ui.Renderer.PieceEvent.GameListener;
+import ui.Renderer.PieceEvent.PieceListener;
+import ui.Renderer.PieceEvent.PieceMoveEvent;
+import ui.Renderer.PieceEvent.TeamEvent;
 
 public class VisualBoard extends TraditionalBoard{	
+	
+	//private SoundPlayer player = new SoundPlayer();
+	public AssetLoader loader = new AssetLoader(teams);
+	
+	private SoundPlayer bgm = new SoundPlayer();
+	private File now_playing = null;
+	
 	public VisualBoard() {
 		super();
-		GRID_COLOR = Color.CYAN;
+		GRID_COLOR = Color.white;
+		
+		addPieceListener(new PieceListener() {		
+			@Override
+			public void pieceMoved(PieceMoveEvent e) {
+				playEffect(e.piece, "place");		
+			}
+			
+			@Override
+			public void pieceKilled(PieceMoveEvent e) {
+				playEffect(e.piece, "kill");
+			}
+		});
+		
+		addGameListener(new GameListener() {
+			
+			@Override
+			public void check(TeamEvent e) {
+				changeBGM(loader.check);
+			}
+			
+			@Override
+			public void checkmate(TeamEvent e) {
+				changeBGM(loader.checkmate);
+			}
+
+			@Override
+			public void defended(TeamEvent e) {
+				bgm.stop();
+				now_playing = null;
+			}
+		});
 	}
 
+	private void changeBGM(File sound){
+		if(now_playing!=null && now_playing!=sound) bgm.stop();
+		
+		if(sound!=null && now_playing!=sound){
+			bgm.play(sound);
+			now_playing = sound; 
+		}
+	}
+	
+	private void playEffect(iPiece piece, String state){
+		File sound = loader.getSoundWhen(piece, state); 
+		if(sound!=null) new SoundPlayer().play(sound);
+	}
+	
 	private final double piece_size = 0.065; 	
 	
 	@Override

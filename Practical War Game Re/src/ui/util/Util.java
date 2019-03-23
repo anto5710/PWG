@@ -1,4 +1,4 @@
-package ui;
+package ui.util;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Stream;
+
+import ui.Assert;
 
 public class Util {
 	

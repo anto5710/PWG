@@ -13,7 +13,7 @@ import board.Pieces.iPiece;
 import ui.Assert;
 import ui.FileExplorer;
 import ui.MainFrame;
-import ui.Util;
+import ui.util.Util;
 
 public class AssetLoader {
 	private FileExplorer main_folder, skines_folder, background_folder, bgm_folder;

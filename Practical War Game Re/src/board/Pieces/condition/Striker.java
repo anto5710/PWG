@@ -4,6 +4,7 @@ import board.Coord;
 import board.Shogi;
 import board.Pieces.iPiece;
 import board.Pieces.ChessPieces.Cannon;
+import board.Pieces.movable.GeneralAction;
 
 public class Striker extends Strider{
 
@@ -15,10 +16,10 @@ public class Striker extends Strider{
 	public int canBeDest(Shogi game, Coord to, Coord origin) {
 		iPiece target = game.get(to);
 		
-		if(target==null) return CONTINUE;
+		if(target==null) return GeneralAction.CONTINUE;
 		
-		if(target.sameTeam(piece)) return FAILURE;
+		if(target.sameTeam(piece)) return GeneralAction.FAILURE;
 		
-		return COMPLETE;
+		return GeneralAction.COMPLETE;
 	}
 }

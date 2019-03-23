@@ -33,7 +33,6 @@ public class Shogi {
 	 */
 	private List<Coord[]> diagonals = new ArrayList<>();
 	
-	
 	/*
 	 * 최대 4팀까지
 	 */
@@ -64,7 +63,6 @@ public class Shogi {
 		double[] centerCoord = {tile_row/2D,tile_column/2D};
 		center = centerCoord;
 		pieces = new iPiece[width][height];
-
 		
 		this.teams = teams;
 		
@@ -75,8 +73,7 @@ public class Shogi {
 	}
 
 	public Status getStatus(Team team){
-		if(!castles.containsKey(team)) return null;
-		
+		Assert.throwIF(!castles.containsKey(team), "No such team:"+team); 
 		if(check(team)){
 			return checkmate(team) ? Status.CHECKMATE : Status.CHECK;
 		}

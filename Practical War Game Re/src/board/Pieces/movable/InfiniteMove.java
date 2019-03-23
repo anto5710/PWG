@@ -10,7 +10,7 @@ import board.Pieces.condition.Strider;
 import board.Pieces.condition.iRouteCondition;
 
 
-public class InfiniteMove extends GeneralMove {
+public class InfiniteMove extends GeneralAction {
 
 	public InfiniteMove(Pieces pclass, Team team) {
 		super(pclass, team);
@@ -31,7 +31,7 @@ public class InfiniteMove extends GeneralMove {
 			isDest = true;
 		}		
 		
-		if(state!=Strider.FAILURE){
+		if(state!=GeneralAction.FAILURE){
 			if(!isDest){
 				state *= c.canBePass(game, cur, route.origin);	
 			}else{
@@ -39,14 +39,14 @@ public class InfiniteMove extends GeneralMove {
 			}
 		}
 		
-		if(state == Strider.FAILURE){
+		if(state == GeneralAction.FAILURE){
 			return route.destN==0? null : route;
 		}
 		
 		route.addCoord(cur);
 		if(isDest) route.plusDest();
 		
-		if(state==Strider.COMPLETE){
+		if(state==GeneralAction.COMPLETE){
 			if(isDest){
 				return route;
 			}

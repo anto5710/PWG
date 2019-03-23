@@ -15,8 +15,8 @@ public class Tactician extends FiniteMove {
 	private static final int[][] dd2 = {{-1,1}};
 	public Tactician(Team team) {
 		super(Pieces.TACTICIAN, team);
-		addGeneralMoves(new CastleDweller(this), d1, d2);
-		addGeneralMoves(new XStrider(this), dd1, dd2);
+		addGeneralActions(new CastleDweller(this), d1, d2);
+		addGeneralActions(new XStrider(this), dd1, dd2);
 	}
 
 }

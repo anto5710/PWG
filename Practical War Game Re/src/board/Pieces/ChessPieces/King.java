@@ -15,7 +15,7 @@ public class King  extends FiniteMove{
 	private static final int[][] d2 = {{0,1}};
 	public King(Team team) {
 		super(Pieces.KING, team);
-		addGeneralMoves(new CastleDweller(this), d1, d2);
-		addGeneralMoves(new XStrider(this), dd1, dd2);
+		addGeneralActions(new CastleDweller(this), d1, d2);
+		addGeneralActions(new XStrider(this), dd1, dd2);
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import ui.Assert;
-import ui.Util;
+import ui.util.Util;
 
 public class Coord {
 	public final int x,y ;
@@ -98,6 +98,7 @@ public class Coord {
 	
 	public static Coord[] listfrom2D(int[][]coordArray){
 		Coord[] c = new Coord[coordArray.length];
+		
 		for(int i=0;i<coordArray.length;i++){
 			c[i] = new Coord(coordArray[i][0],coordArray[i][1]);
 		}

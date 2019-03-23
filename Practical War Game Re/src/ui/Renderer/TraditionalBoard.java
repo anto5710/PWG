@@ -9,8 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,15 +19,8 @@ import board.Team;
 import board.Pieces.Pieces;
 import board.Pieces.iPiece;
 import board.Pieces.condition.Route;
-import ui.FileExplorer;
-import ui.MainFrame;
-import ui.SoundPlayer;
-import ui.Util;
-import ui.Renderer.PieceEvent.GameListener;
-import ui.Renderer.PieceEvent.PieceListener;
-import ui.Renderer.PieceEvent.PieceMoveEvent;
-import ui.Renderer.PieceEvent.TeamEvent;
 import ui.Renderer.fundament.RenderableBoard;
+import ui.util.Util;
 
 public class TraditionalBoard extends RenderableBoard{
 			
@@ -45,10 +36,9 @@ public class TraditionalBoard extends RenderableBoard{
 //	private final double prev_size = 0.02;
 
 	private Map<Pieces, Double> sizes = new HashMap<>();
-	public AssetLoader loader = new AssetLoader(teams);
 	
 	protected double getSize(Pieces pclass){
-		return sizes.containsKey(pclass)? sizes.get(pclass):1;
+		return (sizes.containsKey(pclass)? sizes.get(pclass):1)*8D/game.tile_column;
 	}
 	
 //	protected FileExplorer mainFolder(){
@@ -65,17 +55,22 @@ public class TraditionalBoard extends RenderableBoard{
 	
 	protected static Team[]teams = {
 			new Team("漢", Color.RED), 
-			new Team("楚", Color.BLUE)};
+			new Team("楚", Color.BLUE)
+//			new Team("간", Color.GREEN),
+//			new Team("D", Color.BLACK)
+			};
 				
 	
-	
-//	private SoundPlayer player = new SoundPlayer();
-	private SoundPlayer bgm = new SoundPlayer();
 	public TraditionalBoard(){
-		this(Formation.HEEH_ROTATED, teams);
+		this(Formation.TOTAL_WAR, teams);
 		sizes.put(Pieces.PRIVATE, 0.8);
 		sizes.put(Pieces.TACTICIAN, 0.8);
 		sizes.put(Pieces.KING, 1.2);
+//		game = new ImageRenderer("resource").generate("e.png", sq);
+	}
+	
+	public TraditionalBoard(Formation f, Team...teams) {
+		super(f, teams);
 		
 		addMouseMotionListener(new MouseAdapter() {
 			@Override
@@ -83,45 +78,6 @@ public class TraditionalBoard extends RenderableBoard{
 				whenMouseMoved(e);
 			}
 		});
-		
-		addPieceListener(new PieceListener() {		
-			@Override
-			public void pieceMoved(PieceMoveEvent e) {
-				playEffect(e.piece, "place");		
-			}
-			
-			@Override
-			public void pieceKilled(PieceMoveEvent e) {
-				playEffect(e.piece, "kill");
-			}
-		});
-		
-		addGameListener(new GameListener() {
-			
-			@Override
-			public void check(TeamEvent e) {
-				changeBGM(loader.check);
-			}
-			
-			@Override
-			public void checkmate(TeamEvent e) {
-				changeBGM(loader.checkmate);
-			}
-
-			@Override
-			public void defended(TeamEvent e) {
-				bgm.stop();
-				now = null;
-			}
-		});
-//		game = new ImageRenderer("resource").generate("e.png", sq);
-	}
-	
-	private File now = null;
-	
-	
-	public TraditionalBoard(Formation f, Team...teams) {
-		super(f, teams);
 	}
 	
 	private final Color COLOR_DEFAULT = Color.WHITE;
@@ -130,16 +86,15 @@ public class TraditionalBoard extends RenderableBoard{
 	private final Color COLOR_PREVIEW = new Color(255, 200, 200, 80);
 	private final Color COLOR_SHADE = Color.DARK_GRAY;
 	private final Color COLOR_MOVING = new Color(255, 200, 200, 60);
-	
 
 	private final Color COLOR_PASS = Util.setAlpha(Color.RED, 86);
 	private final Color COLOR_DEST = new Color(219, 39, 39, 80);
-	
-	
+		
 	private final double piece_size = 0.04; 
 	private final double bevel = 0.06; 
 	private final double shade_t = 0.007; 
 	private final double char_size = 0.07; 
+	private final double dot = 0.01;
 	
 	private final int Npoly = 8;
 	
@@ -150,7 +105,6 @@ public class TraditionalBoard extends RenderableBoard{
 	}
 			
 	public void drawPiece(Graphics2D g, iPiece piece, int px, int py, int state){
-		
 		double scale = getSize(piece.getPClass());
 		
 		String symbol = piece.getPClass().getSymbol();		
@@ -179,9 +133,9 @@ public class TraditionalBoard extends RenderableBoard{
 		g.setColor(color);
 		g.fillPolygon(Util.getNPolygon(px, py, Npoly, r, r));
 		
+		
 		if(state==MOVING) return;
 			
-		
 		// char bevel-in
 		updateFont(g, fs);
 		g.setColor(piece.getTeam().getColor().darker().darker());	
@@ -212,19 +166,6 @@ public class TraditionalBoard extends RenderableBoard{
 		if(pieceFocused()) repaint();
 	}
 	
-	private void changeBGM(File sound){
-		if(now!=null && now!=sound) bgm.stop();
-		
-		if(sound!=null && now!=sound){
-			bgm.play(sound);
-			now = sound; 
-		}
-	}
-	
-	private void playEffect(iPiece piece, String state){
-		File sound = loader.getSoundWhen(piece, state); 
-		if(sound!=null) new SoundPlayer().play(sound);
-	}
 	
 	@Override
 	public void renderRoutes(Graphics2D g){
@@ -284,13 +225,15 @@ public class TraditionalBoard extends RenderableBoard{
 	public void drawCastles(Graphics g){
 		for(Team team: game.castles().keySet()){
 			Coord castle = game.castles().get(team);
-			int []pixel = toPixel(castle);
-							
-			g.setColor(team.getColor());
-			Util.fillCircleAtCenter(g, pixel, 5);
-
+			int []pixel = toPixel(castle);		
+			int dot = szI(this.dot);
+			int dotb = szI(0.4*this.dot);
+			
 			g.setColor(GRID_COLOR);
-			Util.fillCircleAtCenter(g, pixel, 4);
+			Util.fillCircleAtCenter(g, pixel, dot);
+			
+			g.setColor(team.getColor());
+			Util.fillCircleAtCenter(g, pixel, dotb);
 		}
 	}
 	

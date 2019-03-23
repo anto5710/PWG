@@ -16,8 +16,8 @@ public class Private extends FiniteMove{
 	
 	public Private(Team team) {
 		super(Pieces.PRIVATE, team);
-		addGeneralMoves(new Unrecedable(this), d1, d2);
-		addGeneralMoves(new XStrider(this), dd1, dd2);
+		addGeneralActions(new Unrecedable(this), d1, d2);
+		addGeneralActions(new XStrider(this), dd1, dd2);
 	}
 	
 }

@@ -9,7 +9,6 @@ import board.Pieces.condition.Route;
 
 public abstract class AbstractPiece implements iPiece{
 	
-	
 	private final Pieces pclass;
 	private final Team team;
 	

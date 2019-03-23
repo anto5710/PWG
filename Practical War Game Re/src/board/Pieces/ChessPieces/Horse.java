@@ -13,7 +13,7 @@ public class Horse extends FiniteMove{
 						
 	public Horse(Team team) {
 		super(Pieces.HORSE, team);
-		addGeneralMoves(new Strider(this), d1, d2);		
+		addGeneralActions(new Strider(this), d1, d2);		
 	}
 
 }
