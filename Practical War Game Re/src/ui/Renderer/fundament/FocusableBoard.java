@@ -2,10 +2,13 @@ package ui.Renderer.fundament;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import board.ADual;
 import board.Coord;
 import board.Formation;
 import board.Team;
 import board.Pieces.iPiece;
+import multi.client.ui.MainFrame;
 
 
 public class FocusableBoard extends DynamicBoard{
@@ -15,8 +18,8 @@ public class FocusableBoard extends DynamicBoard{
 	public final static int PREVIEW = 3;
 	public final static int MOVING = 4;
 	
-	public FocusableBoard(Formation f, Team...teams) {
-		super(f,teams);
+	public FocusableBoard(ADual game) {
+		super(game);
 
 		addMouseListener(new MouseAdapter() {	
 			
@@ -51,7 +54,7 @@ public class FocusableBoard extends DynamicBoard{
 	}
 	
 	protected iPiece focusedPiece(){
-		if(!pieceFocused()) return null;
+		if(!focusing()) return null;
 		
 		return game.get(focused_coord);
 	}
@@ -69,7 +72,7 @@ public class FocusableBoard extends DynamicBoard{
 		repaint();
 	}
 	
-	protected boolean pieceFocused(){
+	protected boolean focusing(){
 		return focused_coord!=null;
 	}
 
@@ -82,7 +85,7 @@ public class FocusableBoard extends DynamicBoard{
 			defocus(); return;
 		}
 			
-		if(pieceFocused()){
+		if(focusing()){
 			if(!pointing.equals(focused_coord) &&
 			   !game.onRoute(focused_coord, pointing)){ // went out
 				defocus();
@@ -93,7 +96,7 @@ public class FocusableBoard extends DynamicBoard{
 	}
 	
 	private void whenBoardClicked(MouseEvent e){
-		if(!pieceFocused()) return;
+		if(!focusing()) return;
 		Coord clicked = toCoord(e.getX(), e.getY());
 		
 		if(fixed){
@@ -102,7 +105,9 @@ public class FocusableBoard extends DynamicBoard{
 			fixed = true;  
 		}
 		
-		tryMove(focused_coord, clicked);
+		if(MainFrame.INSTANCE.handler == null || game.nthTeam == MainFrame.INSTANCE.team){
+			tryMove(focused_coord, clicked);
+		}
 		repaint();
 		System.out.println("moved!");
 	}

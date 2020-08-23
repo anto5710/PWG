@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import board.ADual;
 import board.Coord;
 import board.Formation;
 import board.Shogi;
@@ -17,16 +18,14 @@ import ui.Renderer.PieceEvent.PieceMoveEvent;
 import ui.Renderer.PieceEvent.TeamEvent;
 
 
-public class ListeningBoard extends JPanel{
-	protected Shogi game;
-	protected boolean centered = true;
+public abstract class ListeningBoard extends JPanel{
+	public ADual game;
 
 	private List<PieceListener> pieceLs = new ArrayList<>();
 	private List<GameListener> gameLs = new ArrayList<>();
 	
-	public ListeningBoard(Formation f, Team...teams) {
-		Assert.throwIF(f==null || teams.length>4 || teams.length==0, "Invalid formation or invalid number of teams");
-		game = new Shogi(f,teams);
+	public ListeningBoard(ADual game) {
+		this.game = game;
 	}
 		
 	public void tryMove(Coord from, Coord to){

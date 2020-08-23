@@ -1,5 +1,6 @@
 package board.Pieces.movable;
 
+import board.ADual;
 import board.Coord;
 import board.Shogi;
 import board.Team;
@@ -13,8 +14,8 @@ public class FiniteMove extends GeneralAction{
 		super(pclass, team);
 	}
 	
-	public Route findRoute(Shogi game, Route route, Coord cur, Coord[]move, iRouteCondition c){
-		cur = cur.move(move[route.index()]);
+	public Route findRoute(ADual game, Route route, Coord cur, Coord[]move, iRouteCondition c){
+		cur = cur.add(move[route.index()]);
 		int state = GeneralAction.CONTINUE;
 		boolean isDest = route.index()==move.length-1;
 		
@@ -32,6 +33,7 @@ public class FiniteMove extends GeneralAction{
 		route.addCoord(cur);
 		
 		if(isDest) return route;
+		
 		return findRoute(game, route, cur, move, c);
 	}
 }

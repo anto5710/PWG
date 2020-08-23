@@ -1,5 +1,6 @@
 package ui.Renderer.PieceEvent;
 
+import board.ADual;
 import board.Coord;
 import board.Shogi;
 import board.Pieces.iPiece;
@@ -7,11 +8,11 @@ import board.Pieces.iPiece;
 public class PieceEvent{
 	public final iPiece piece;
 	public final Coord coord;
-	public final Shogi game;
-	public PieceEvent(Shogi game, iPiece piece, Coord coord){
+	public final ADual game;
+	public PieceEvent(ADual game2, iPiece piece, Coord coord){
 		this.piece = piece;
 		this.coord = coord;
-		this.game = game;
+		this.game = game2;
 	}
 	
 	

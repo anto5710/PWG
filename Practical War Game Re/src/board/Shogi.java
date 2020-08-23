@@ -9,68 +9,45 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import board.Pieces.AbstractPiece;
 import board.Pieces.MetaPieceSet;
 import board.Pieces.Pieces;
 
 import board.Pieces.iPiece;
+import board.Pieces.ChessPieces.Cannon;
+import board.Pieces.ChessPieces.Chariot;
+import board.Pieces.ChessPieces.Elephant;
+import board.Pieces.ChessPieces.Horse;
 import board.Pieces.ChessPieces.King;
+import board.Pieces.ChessPieces.Private;
+import board.Pieces.ChessPieces.Tactician;
+import board.Pieces.ChessPieces.Cseries.CElephant;
 import board.Pieces.condition.Route;
 import ui.Assert;
+import ui.Renderer.PieceEvent.GameListener;
+import ui.util.Util;
 
-public class Shogi {
-	public final int tile_row, tile_column; //칸
-	public final int width, height;  // 좌표
-	public iPiece[][] pieces;
+public class Shogi extends ADual {
+	static Map<Pieces, Class<? extends iPiece>> AIs = new HashMap<>();
 	
-	private Map<Team, Coord> castles = new HashMap<>();
-	public final double [] center; //배열의 좌표 아님
-	private Team []teams;
-	private int nthTeam=0;
+
+
 	
+	public Shogi(Formation formation, Team[]teams) {
+		super(formation, teams);
+	}
 	
+	public Shogi(iPiece[][] p, Team[] teams){
+		super(p, teams);
+	}
+
+	protected Map<Team, Coord> castles;
+		
 	/*
 	 * 대각선을 나타내는 리스트, 각각 크기가 2인 1차원배열로 하나의 대각선을 나타낸다.
 	 */
-	private List<Coord[]> diagonals = new ArrayList<>();
-	
-	/*
-	 * 최대 4팀까지
-	 */
-	public Shogi(Formation formation, Team... teams) {
-		Assert.throwIF(teams.length>4, "No more than 4 teams");
-		
-		this.width = formation.W;
-		this.height = formation.H;
-		this.tile_row = width-1;
-		this.tile_column = height-1;
-		
-		double[] centerCoord = {tile_row/2D,tile_column/2D};
-		center = centerCoord;
-		pieces = new iPiece[width][height];
+	protected List<Coord[]> diagonals;
 
-		this.teams = teams;
-		nthTeam=0;
-//		setCastles();
-		formate(formation);
-	}
-	
-	public Shogi(iPiece[][] p, Team[] teams) {		
-		this.tile_row = p.length-1;
-		this.tile_column = p[0].length-1;
-		this.width = tile_row + 1;
-		this.height = tile_column + 1;
-		
-		double[] centerCoord = {tile_row/2D,tile_column/2D};
-		center = centerCoord;
-		pieces = new iPiece[width][height];
-		
-		this.teams = teams;
-		
-		nthTeam=0;
-//		setCastles();
-//		System.out.println(width + "d2 "+ height);
-		this.pieces = p;
-	}
 
 	public Status getStatus(Team team){
 		Assert.throwIF(!castles.containsKey(team), "No such team:"+team); 
@@ -81,6 +58,8 @@ public class Shogi {
 	}
 	
 	private Coord findKing(Team team){
+		Assert.throwIF(getCastle(team)==null, "No Castle Found for team: "+ team.getName());
+		
 		for(Coord c : getCastle(team).squareRange(1)){
 			iPiece p = pieces[c.x][c.y];
 			if(p instanceof King && team.in(p)) return c;
@@ -96,8 +75,7 @@ public class Shogi {
 	}
 	
 	public boolean checkmate(Team team){
-		if(!check(team)) return false;
-		return !anyPiece((p,pLoc)-> team.in(p) && defendable(pLoc.x, pLoc.y));
+		return check(team) && !anyPiece((p,pLoc)-> team.in(p) && defendable(pLoc.x, pLoc.y));
 	}
 	
 	private boolean defendable(int xi, int yi){
@@ -109,7 +87,7 @@ public class Shogi {
 											(d->!checkIFmoved(team, xi, yi, d.x, d.y)));
 	}
 		
-	public boolean anyInRoute(int xi, int yi, Predicate<Route> condition){
+	public boolean anyInRoute(int xi, int yi, Predicate<Route>condition){
 		iPiece piece = pieces[xi][yi];
 		if(piece==null) return false;
 		
@@ -138,15 +116,6 @@ public class Shogi {
 		return false;
 	}
 	
-	public Team turn(){
-		return teams[nthTeam];
-	}
-	
-	public void next(){
-		nthTeam++;
-		nthTeam%=teams.length;
-	}
-
 	private boolean checkIFmoved(Team team, int xi, int yi, int xf, int yf){
 		iPiece toMove = pieces[xi][yi];
 		iPiece abg = pieces[xf][yf];
@@ -178,47 +147,30 @@ public class Shogi {
 		
 		return !checkIFmoved(toMove.getTeam(), xi, yi, xf, yf);
 	}
+
+	@Override
+	protected void formate(Formation formation){
+		 castles = new HashMap<>();
+		 diagonals =  new ArrayList<>();;
+		AIs.put(Pieces.CANNON, Cannon.class);
+		AIs.put(Pieces.CHARIOT, Chariot.class);
+		AIs.put(Pieces.ELEPHANT, Elephant.class);
+		AIs.put(Pieces.HORSE, Horse.class);
+		AIs.put(Pieces.KING, King.class);
+		AIs.put(Pieces.PRIVATE, Private.class);
+		AIs.put(Pieces.TACTICIAN, Tactician.class);
 	
-	public boolean onBoard(int x, int y){
-		return 0 <= x && x < width && 0 <= y && y < height; 
-	}
-	
-	public boolean isThereStone(int x, int y){
-		return pieces[x][y]!=null;
-	}
-	
-	private void formate(Formation formation){
+		
 		for(Coord c : formation.meta().keySet()){
 			MetaPieceSet meta = formation.meta().get(c);
-			iPiece p = Pieces.castFromSymbol(meta.symbol, teams[meta.team]);
-			
+			iPiece p =Pieces.cast(meta, teams, AIs); 			
 			pieces[c.x][c.y] = p;
 			if(p instanceof King){ 
 				setCastle(p.getTeam(), c);
 			}
 		}
 	}
-
-//	private void setCastles(){
-//		double xr = center[0] - 1;
-//		double yr = center[1] -1;		
-//	
-//		Polygon p = Util.getNPolygon(center[0], center[1], teams.length, xr, yr);
-//		for(int i=0; i<teams.length; i++){
-//			Coord castle = new Coord(p.xpoints[i], p.ypoints[i]);
-//			
-//			setCastle(teams[i], castle);
-//		}
-//	}
 	
-	private void setCastle(Team team, Coord castle) {
-		if(castle!=null && Arrays.asList(teams).contains(team)) {
-			System.out.println("castle" + team);
-			castles.put(team, castle);
-			addDiagonal(castle.move(1, 1), castle.move(-1, -1));
-			addDiagonal(castle.move(-1, 1), castle.move(1, -1));
-		}
-	}
 
 	public void addDiagonal(Coord c1, Coord c2){
 		if(!onBoard(c1) || !onBoard(c2) || c1.equals(c2)) return;
@@ -246,32 +198,29 @@ public class Shogi {
 		return false;
 	}
 		
+	protected void setCastle(Team team, Coord castle) {
+		if(castle!=null && Arrays.asList(teams).contains(team)) {
+			System.out.println("castle" + team);
+			castles.put(team, castle);
+			addDiagonal(castle.add(1, 1), castle.add(-1, -1));
+			addDiagonal(castle.add(-1, 1), castle.add(1, -1));
+		}
+	}
+
 	public Map<Team, Coord> castles(){
 		return castles;
 	}
 	
-	public iPiece get(int x, int y) {
-		return pieces[x][y];
-	}
-
-	public boolean onBoard(Coord coord) {
-		return onBoard(coord.x, coord.y);
-	}
-
-	public boolean isThereStone(Coord coord) {
-		return isThereStone(coord.x, coord.y);
-	}
-
-	public iPiece get(Coord to) {
-		return get(to.x, to.y);
-	}
-
 	public Coord getCastle(Team team){
 		return castles.get(team);
 	}
 	
 	public boolean inCastle(Team team, Coord to) {
 		Coord castle = getCastle(team);
-		return castle!=null && castle.squareRange(1).contains(to);
+		
+		for(Coord c : castle.squareRange(1)){
+			if(c.equals(to))return castle!=null;
+		}
+		return false;
 	}
 }

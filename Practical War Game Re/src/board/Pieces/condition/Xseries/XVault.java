@@ -1,5 +1,6 @@
 package board.Pieces.condition.Xseries;
 
+import board.ADual;
 import board.Coord;
 import board.Shogi;
 import board.Pieces.iPiece;
@@ -12,7 +13,7 @@ public class XVault extends Vaultable{
 	}
 	
 	@Override
-	public int canBeDest(Shogi game, Coord to, Coord origin) {
+	public int canBeDest(ADual game, Coord to, Coord origin) {
 		return condize(game.onADiagonal(origin, to)) * super.canBeDest(game, to, origin);
 	}
 

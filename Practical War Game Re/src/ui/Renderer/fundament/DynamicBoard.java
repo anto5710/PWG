@@ -1,21 +1,23 @@
 package ui.Renderer.fundament;
 
+import board.ADual;
 import board.Coord;
 import board.Formation;
 import board.Team;
 
 
-public class DynamicBoard extends ListeningBoard{
-	protected boolean centered = true;
+public abstract class DynamicBoard extends ListeningBoard{
 	
-	public DynamicBoard(Formation f, Team...teams) {
-		super(f, teams);
+	public DynamicBoard(ADual game) {
+		super(game);
 	}
 	
 	// length에 대한 비율값
 	private final double board_border = 0.05; 
 	private final double border = 0.025;
-			
+	
+	protected boolean centered = true;
+	
 	public Coord toCoord(int px, int py){
 		int x = (int)Math.round((px-(boardLength()*board_border+tx()))/tileWidth());
 		int y = (int)Math.round((py-(boardLength()*board_border+ty()))/tileHeight());
@@ -51,7 +53,7 @@ public class DynamicBoard extends ListeningBoard{
 	}
 	
 	public int boardLength(){	
-		return (int) (Math.min(getWidth(), getHeight())*(1-2*border));
+		return (int) Math.round((Math.min(getWidth(), getHeight())*(1-2*border)));
 	}
 	
 	public double tileWidth(){

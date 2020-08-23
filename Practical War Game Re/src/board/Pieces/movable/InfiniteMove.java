@@ -1,6 +1,7 @@
 package board.Pieces.movable;
 
 
+import board.ADual;
 import board.Coord;
 import board.Shogi;
 import board.Team;
@@ -17,14 +18,14 @@ public class InfiniteMove extends GeneralAction {
 	}
 	
 	@Override
-	public Route findRoute(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c) {
+	public Route findRoute(ADual game, Route route, Coord cur, Coord[] move, iRouteCondition c) {
 		route.destN=0;
 		return findRoute(game,route,cur, move,c,false);
 	}
 	
-	public Route findRoute(Shogi game, Route route, Coord cur, Coord[] move, iRouteCondition c, boolean isDest) {
+	public Route findRoute(ADual game, Route route, Coord cur, Coord[] move, iRouteCondition c, boolean isDest) {
 		int i = route.index()%move.length;
-		cur = cur.move(move[i]);
+		cur = cur.add(move[i]);
 		
 		int state = Strider.condize(game.onBoard(cur));
 		if(move.length<=1){
@@ -43,8 +44,10 @@ public class InfiniteMove extends GeneralAction {
 			return route.destN==0? null : route;
 		}
 		
-		route.addCoord(cur);
-		if(isDest) route.plusDest();
+		if(state != GeneralAction.PASS){
+			route.addCoord(cur);
+			if(isDest) route.plusDest();
+		}
 		
 		if(state==GeneralAction.COMPLETE){
 			if(isDest){

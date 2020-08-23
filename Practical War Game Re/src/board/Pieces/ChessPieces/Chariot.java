@@ -2,8 +2,8 @@ package board.Pieces.ChessPieces;
 
 
 import board.Team;
+
 import board.Pieces.Pieces;
-import board.Pieces.condition.Strider;
 import board.Pieces.condition.Striker;
 import board.Pieces.condition.Xseries.XStriker;
 import board.Pieces.movable.InfiniteMove;

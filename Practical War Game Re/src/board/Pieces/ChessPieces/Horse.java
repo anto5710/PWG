@@ -15,5 +15,4 @@ public class Horse extends FiniteMove{
 		super(Pieces.HORSE, team);
 		addGeneralActions(new Strider(this), d1, d2);		
 	}
-
 }

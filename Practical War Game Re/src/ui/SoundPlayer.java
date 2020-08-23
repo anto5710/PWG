@@ -41,8 +41,6 @@ public class SoundPlayer {
 	public void play(File sound) {
 		Assert.throwIF(sound==null || !sound.exists(), "Imaginary .wav cannot be played");
 		try {
-			
-			
 			AudioInputStream stream = AudioSystem.getAudioInputStream(sound);
 		    AudioFormat format = stream.getFormat();
 

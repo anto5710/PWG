@@ -1,14 +1,15 @@
 package board;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import ui.Assert;
 import ui.util.Util;
 
 public class Coord {
-	public final int x,y ;
+	public final int x,y;
 	
 	public Coord(int x, int y) {
 		this.x = x;
@@ -34,7 +35,7 @@ public class Coord {
 	}
 	
 	public double slope(Coord c){
-		if(c.x==x) return (c.y-y>0)? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+		if(c.x==x) return (c.y-y>0) ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
 		
 		return (c.y - y)/(c.x - x); 
 	}
@@ -43,15 +44,12 @@ public class Coord {
 		return Util.between(c1.x, x, c2.x) && Util.between(c1.y, y, c2.y);
 	}
 	
-	public List<Coord> squareRange(double margin){
-		List<Coord> coords = new ArrayList<>();
+	public Set<Coord> squareRange(double margin){
+		Set<Coord> coords = new HashSet<>();
 		for(double dx=-margin; dx<=margin; dx+=margin){
 			for(double dy=-margin; dy<=margin; dy+=margin){
-				Coord cur = new Coord((int)Math.round(dx+x), (int)Math.round(dy+y));
-				
-				if(!coords.contains(cur)){ 
-					coords.add(cur);
-				}
+				Coord cur = new Coord((int)Math.round(dx+x), (int)Math.round(dy+y));				 
+				coords.add(cur);
 			}
 		}
 		return coords;
@@ -76,12 +74,20 @@ public class Coord {
 		return "("+x+", "+y+")";
 	}
 	
-	public Coord move(Coord delta){
-		return move(delta.x, delta.y);
+	public Coord add(Coord delta){
+		return add(delta.x, delta.y);
 	}
 	
-	public Coord move(int dx, int dy){
+	public Coord add(int dx, int dy){
 		return new Coord(x+dx, y+dy);
+	}
+	
+	public Coord subtract(Coord delta){
+		return add(delta.multiply(-1));
+	}
+	
+	public Coord subtract(int dx, int dy){
+		return add(-dx, -dy);
 	}
 
 	public Coord multiply(int dx, int dy){
@@ -117,5 +123,21 @@ public class Coord {
 		int dx = c1.x - x;
 		int dy = c1.y - y;
 		return dx*dx + dy*dy <= d*d;
+	}
+
+	public static Coord parse(String st) {
+		int x = 0, y=0;
+		String string = st.substring(1, st.length()-1);
+		
+		
+		try{
+			String [] s23t = string.split(",");
+		x = Integer.parseInt(s23t[0].trim());
+		y = Integer.parseInt(s23t[1].trim());
+		}catch(Exception e){
+			System.out.println("Failed to parse coords movement data from server");
+			e.printStackTrace();
+		}
+		return new Coord(x,y);
 	}
 }

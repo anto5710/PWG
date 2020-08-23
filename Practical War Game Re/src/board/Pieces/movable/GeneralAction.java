@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import board.ADual;
 import board.Coord;
 import board.Shogi;
 import board.Team;
@@ -23,6 +24,7 @@ public abstract class GeneralAction extends AbstractPiece{
 	public final static int FAILURE = 0;
 	public final static int CONTINUE= 1;
 	public final static int COMPLETE = 2;
+	public final static int PASS = 3;
 	
 	public GeneralAction(Pieces pclass, Team team) {
 		super(pclass, team);
@@ -37,7 +39,7 @@ public abstract class GeneralAction extends AbstractPiece{
 	}
 	
 	public void addGeneralAction(iRouteCondition c, Coord[]src_action){
-		Assert.throwIF(src_action==null, "The action of a piece cannot be null");
+		Assert.throwIF(src_action==null, "An action of a piece cannot be null");
 		
 		for(int[]rot : rotations){
 			Coord[] newaction = Coord.multiplyAll(src_action, rot);			
@@ -60,7 +62,7 @@ public abstract class GeneralAction extends AbstractPiece{
 	}
 	
 	@Override
-	public final List<Route> findRoutes(Shogi game, Coord origin) {	
+	public final List<Route> findRoutes(ADual game, Coord origin) {	
 		List<Route> routes = new ArrayList<>();
 		
 //		System.out.println("size: "+ actions.keySet().size());
@@ -73,5 +75,5 @@ public abstract class GeneralAction extends AbstractPiece{
 		return routes;
 	}
 	
-	public abstract Route findRoute(Shogi game, Route route, Coord cur, Coord[]action, iRouteCondition c);
+	public abstract Route findRoute(ADual game, Route route, Coord cur, Coord[]action, iRouteCondition c);
 }

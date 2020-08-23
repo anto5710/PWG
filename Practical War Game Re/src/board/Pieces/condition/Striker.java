@@ -1,9 +1,10 @@
 package board.Pieces.condition;
 
+import board.ADual;
 import board.Coord;
+
 import board.Shogi;
 import board.Pieces.iPiece;
-import board.Pieces.ChessPieces.Cannon;
 import board.Pieces.movable.GeneralAction;
 
 public class Striker extends Strider{
@@ -13,7 +14,7 @@ public class Striker extends Strider{
 	}
 	
 	@Override
-	public int canBeDest(Shogi game, Coord to, Coord origin) {
+	public int canBeDest(ADual game, Coord to, Coord origin) {
 		iPiece target = game.get(to);
 		
 		if(target==null) return GeneralAction.CONTINUE;

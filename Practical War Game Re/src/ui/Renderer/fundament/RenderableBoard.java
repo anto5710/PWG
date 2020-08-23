@@ -2,8 +2,10 @@ package ui.Renderer.fundament;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.List;
 
+import board.ADual;
 import board.Coord;
 import board.Formation;
 import board.Team;
@@ -11,8 +13,8 @@ import board.Pieces.iPiece;
 
 public abstract class RenderableBoard extends PerspectiveBoard{
 	
-	public RenderableBoard(Formation f, Team...teams) {
-		super(f, teams);
+	public RenderableBoard(ADual game) {
+		super(game);
 	}
 
 	@Override
@@ -22,7 +24,11 @@ public abstract class RenderableBoard extends PerspectiveBoard{
 		
 		g2d.setTransform(perspective());
 		renderBoard(g2d);
+		
+		g2d.setTransform(new AffineTransform());
 		renderPieces(g2d);
+		
+		g2d.setTransform(perspective());
 		renderRoutes(g2d);
 	}
 
@@ -32,6 +38,7 @@ public abstract class RenderableBoard extends PerspectiveBoard{
 	public abstract void drawPiece(Graphics2D g, iPiece piece, int x, int y, int state);
 
 	public final void renderPieces(Graphics2D g){
+		
 		for(int y=0; y<game.height; y++){
 			for(int x=0; x<game.width; x++){
 				

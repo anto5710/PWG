@@ -1,6 +1,7 @@
 package ui.util;
 
 import java.awt.Color;
+
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -10,14 +11,68 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import ui.Assert;
 
+
 public class Util {
+	
+	public static <K> K instance(Class<K> cls) {
+		try {
+			return cls.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException("fail to create instance", e);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param keys 쉼표로
+	 * @param ins
+	 * @return
+	 */
+	public static Map<String, Object> map(String ptn, Object...ins){
+		String [] keys = ptn.split(",");
+		if(ins.length!=keys.length) return null;
+
+		Map<String, Object> map = new HashMap<>();
+		
+		for(int i = 0; i< keys.length; i++){
+			map.put(keys[i].trim(), ins[i]);
+		}
+		return map;
+	}
+	
+	/**
+	 * 해당 타입을 반환하는 함수형 인터페이스를 인자로 받아 실행하며,
+	 * 도중 오류가 발생할 경우 즉시 RuntimeException을 던져 실행을 중단시킵니다.
+	 * @param <T> 실행하려는 함수형 인터페이스의 구현체
+	 * @throws RuntimeException
+	 */
+	public static <T> T tri(Supplier<T> action) throws RuntimeException{
+		try {
+			return action.get();
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+	
+	public static void tri(Runnable task) throws RuntimeException{
+		try {
+			task.run();
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+	
+	
 	
 	public static boolean between(double min, double num, double max){
 		
@@ -158,7 +213,7 @@ public class Util {
 	            curX = px; // 가로 허용 범위를 넘어가면 한줄 띄움
 	        }
 //	        System.out.println(width+"<-exP  " + wordWidth+" <-act");
-	        g.drawString(word, curX-width/2, (int) (curY-wordHeight*0.8)); //정중앙에 조정
+	        g.drawString(word, curX-width/2, (int) (curY-wordHeight*0.8)); //정중앙에 조정 //0.8
 	        curX += wordWidth;
 	    }
 	}

@@ -2,6 +2,7 @@ package board.Pieces;
 
 import java.util.List;
 
+import board.ADual;
 import board.Coord;
 import board.Shogi;
 import board.Team;
@@ -32,7 +33,7 @@ public abstract class AbstractPiece implements iPiece{
 		return team;
 	}
 	@Override
-	public List<Route> findRoutes(Shogi game, int x, int y) {
+	public List<Route> findRoutes(ADual game, int x, int y) {
 		return findRoutes(game, new Coord(x,y));
 	}
 	

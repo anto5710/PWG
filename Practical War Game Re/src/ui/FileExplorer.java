@@ -10,8 +10,6 @@ import javax.imageio.ImageIO;
 
 import ui.util.Util;
 
-
-
 public class FileExplorer {		
 	static String HOME = Util.APPDATA();
 	private File cur_dir;
@@ -83,6 +81,4 @@ public class FileExplorer {
 		File toRead = new File(cur_dir.getPath() +"/"+ name+".wav");
 		return toRead.exists() ? toRead : null;
 	}
-
-
 }

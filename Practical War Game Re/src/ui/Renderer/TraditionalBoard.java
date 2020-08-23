@@ -9,16 +9,28 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import board.ADual;
 import board.Coord;
 import board.Formation;
+import board.Shogi;
 import board.Team;
+import board.Xiangqi;
 import board.Pieces.Pieces;
 import board.Pieces.iPiece;
 import board.Pieces.condition.Route;
+import multi.client.ui.MainFrame;
+import ui.Renderer.PieceEvent.GameListener;
+import ui.Renderer.PieceEvent.PieceListener;
+import ui.Renderer.PieceEvent.PieceMoveEvent;
+import ui.Renderer.PieceEvent.TeamEvent;
 import ui.Renderer.fundament.RenderableBoard;
 import ui.util.Util;
 
@@ -29,7 +41,7 @@ public class TraditionalBoard extends RenderableBoard{
 	 */
 	private static final long serialVersionUID = -3313278079860331378L;
 	private Color BOARD_COLOR = new Color(239, 192, 98);
-	protected Color GRID_COLOR = Color.BLACK;
+	protected static Color GRID_COLOR = Color.BLACK;
 	private String font = "Kaiti SC";
 
 	// length에 대한 비율값
@@ -53,29 +65,85 @@ public class TraditionalBoard extends RenderableBoard{
 //	private final double char_size = 0.0068*sq*0.11; 
 //	private final double prev_size = 0.002*sq*0.11;		
 	
-	protected static Team[]teams = {
-			new Team("漢", Color.RED), 
-			new Team("楚", Color.BLUE)
+	public static Team[]teams = {
+			new Team("漢", Color.RED , 0), 
+			new Team("楚", Color.BLUE, 1)
 //			new Team("간", Color.GREEN),
 //			new Team("D", Color.BLACK)
 			};
 				
 	
-	public TraditionalBoard(){
-		this(Formation.TOTAL_WAR, teams);
+//	public TraditionalBoard(){
+//		this(Formation.HEEH, teams);
+//		sizes.put(Pieces.PRIVATE, 0.8);
+//		sizes.put(Pieces.TACTICIAN, 0.8);
+//		sizes.put(Pieces.KING, 1.2);
+//		game = new ImageRenderer("resource").generate("e.png", sq);
+//	}
+	
+	public TraditionalBoard(ADual game) {
+		super(game);
 		sizes.put(Pieces.PRIVATE, 0.8);
 		sizes.put(Pieces.TACTICIAN, 0.8);
 		sizes.put(Pieces.KING, 1.2);
-//		game = new ImageRenderer("resource").generate("e.png", sq);
-	}
-	
-	public TraditionalBoard(Formation f, Team...teams) {
-		super(f, teams);
+		
+		addGameListener(new GameListener() {
+			
+			@Override
+			public void defended(TeamEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void checkmate(TeamEvent e) {
+				MainFrame.INSTANCE.over(e.team);
+				
+			}
+			
+			@Override
+			public void check(TeamEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
 		addMouseMotionListener(new MouseAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				whenMouseMoved(e);
+			}
+		});
+		
+		addPieceListener(new PieceListener() {
+			
+			@Override
+			public void pieceMoved(PieceMoveEvent e) {
+				try {
+					if(MainFrame.INSTANCE.handler !=null){
+						System.out.println("handler: "+MainFrame.INSTANCE.handler + "e: "+ e);
+						MainFrame.INSTANCE.handler.sendMove(e.from, e.coord);
+					}
+				} catch (IOException e1) {
+					
+					
+					e1.printStackTrace();
+				}
+				
+				
+			}
+			
+			@Override
+			public void pieceKilled(PieceMoveEvent e) {
+				try {
+					if(MainFrame.INSTANCE.handler !=null){
+						MainFrame.INSTANCE.handler.sendMove(e.from, e.coord);
+					}
+				} catch (IOException e1) {
+					
+					e1.printStackTrace();
+				}
+				
 			}
 		});
 	}
@@ -93,7 +161,7 @@ public class TraditionalBoard extends RenderableBoard{
 	private final double piece_size = 0.04; 
 	private final double bevel = 0.06; 
 	private final double shade_t = 0.007; 
-	private final double char_size = 0.07; 
+	private final double char_size = 0.07; //0.07 
 	private final double dot = 0.01;
 	
 	private final int Npoly = 8;
@@ -103,11 +171,66 @@ public class TraditionalBoard extends RenderableBoard{
 			g.setFont(Util.getFont(font, Font.PLAIN, newS));
 		}
 	}
+	
+	public void drawRawPiece(Graphics2D g, iPiece piece, int px, int py, int state){
+		double scale = getSize(piece.getPClass());
+	
+		
+		String symbol = piece.getPClass().getSymbol(piece.getTeam().num, MainFrame.INSTANCE.gameType);		
+		
+		
+		int fs = szI(char_size*scale);
+		int fsIN = szI(char_size*scale*0.95);
+		
+		int r = szI((1-bevel)*piece_size*scale);
+		int tr = szI(piece_size*scale);
+		int st = szI(shade_t*scale);
+		
+		Color color = getColorOfPieceWhen(state);
+		Color tint = Util.blend(BOARD_COLOR, color);
+		tint = Util.setAlpha(tint, color.getAlpha());
+		Color shade = Util.setAlpha(COLOR_SHADE, color.getAlpha());
+				
+		//shade
+		g.setColor(shade);
+		g.fillPolygon(Util.getNPolygon(px, py+st, Npoly, r, r));
+		
+		//bevel
+		g.setColor(tint);
+		g.fillPolygon(Util.getNPolygon(px, py, Npoly, tr, tr));
+		
+		//fill
+		g.setColor(color);
+		g.fillPolygon(Util.getNPolygon(px, py, Npoly, r, r));
+		
+		
+		if(state==MOVING) return;
 			
+		// char bevel-in
+		updateFont(g, fs);
+		g.setColor(piece.getTeam().getColor().darker().darker());	
+		Util.drawStringJustified(g, symbol, px, py, fs);
+			
+		// char
+		updateFont(g, fsIN);
+		g.setColor(piece.getTeam().getColor());	
+		Util.drawStringJustified(g, symbol, px, py, fsIN);	
+	}	
+	
+	
 	public void drawPiece(Graphics2D g, iPiece piece, int px, int py, int state){
 		double scale = getSize(piece.getPClass());
 		
-		String symbol = piece.getPClass().getSymbol();		
+		Point2D org = new Point(px, py);
+		Point2D rev = null;
+		
+		rev = perspective().transform(org, rev);
+		if(rev!=null){
+			px = (int) rev.getX();
+			py = (int) rev.getY();
+		}
+		
+		String symbol = piece.getPClass().getSymbol(piece.getTeam().num, MainFrame.INSTANCE.gameType);		
 		
 		int fs = szI(char_size*scale);
 		int fsIN = szI(char_size*scale*0.95);
@@ -163,9 +286,8 @@ public class TraditionalBoard extends RenderableBoard{
 	}
 	
 	public void whenMouseMoved(MouseEvent e){
-		if(pieceFocused()) repaint();
+		if(focusing()) repaint();
 	}
-	
 	
 	@Override
 	public void renderRoutes(Graphics2D g){
@@ -183,8 +305,12 @@ public class TraditionalBoard extends RenderableBoard{
 					Coord mouseC = toCoord(mouse.x, mouse.y);
 					
 					if(mouseC.equals(dest)){	
-						mouse =  (Point) applyTransform(mouse);
-						drawPiece(g, piece, mouse.x, mouse.y, PREVIEW);
+//						rev = perspective().transform(mouse, rev);
+//						mouse =  (Point) applyTransform(mouse);
+						g.setTransform(new AffineTransform());
+//						drawPiece(g, piece, (int)rev.getX(), (int)rev.getY(), PREVIEW);
+						drawRawPiece(g, piece, mouse.x, mouse.y, PREVIEW);
+						g.setTransform(perspective());
 					}
 				}
 				g.setColor(COLOR_PASS);
@@ -215,11 +341,35 @@ public class TraditionalBoard extends RenderableBoard{
 		g.fill3DRect(tx(), ty(), boardLength(), boardLength(), true);
 	}
 	
+	private static Color dom = new Color(216, 155, 95);
+	private static Color blend =Util.blend(GRID_COLOR, dom);
+	
 	public void drawGrids(Graphics2D g){
-		g.setColor(GRID_COLOR);
-		g.setStroke(new BasicStroke(1));
-		drawLinesWithin(g, 0, 0, game.width, game.height, true);
-		drawLinesWithin(g, 0, 0, game.width, game.height, false);
+		
+		g.setColor(blend);
+		g.setStroke(new BasicStroke(3));
+		
+		if(game instanceof Xiangqi){
+			drawLinesWithin(g, 0, 0, game.width, game.height/2, true);
+			drawLinesWithin(g, 0, game.height/2, game.width, game.height, true);
+			drawLinesWithin(g, 0, 0, game.width, game.height, false);
+			
+			g.setColor(GRID_COLOR);
+			g.setStroke(new BasicStroke(1));
+			
+			drawLinesWithin(g, 0, 0, game.width, game.height/2, true);
+			drawLinesWithin(g, 0, game.height/2, game.width, game.height, true);
+			drawLinesWithin(g, 0, 0, game.width, game.height, false);
+		}else{
+			drawLinesWithin(g, 0, 0, game.width, game.height, true);
+			drawLinesWithin(g, 0, 0, game.width, game.height, false);
+			
+			g.setColor(GRID_COLOR);
+			g.setStroke(new BasicStroke(1));
+			
+			drawLinesWithin(g, 0, 0, game.width, game.height, true);
+			drawLinesWithin(g, 0, 0, game.width, game.height, false);
+		}
 	}
 
 	public void drawCastles(Graphics g){
@@ -238,8 +388,14 @@ public class TraditionalBoard extends RenderableBoard{
 	}
 	
 	public void drawDiagonals(Graphics g){
-		g.setColor(GRID_COLOR);
+		
 		for(Coord[] line : game.diagonals()){
+			g.setColor(blend);
+			((Graphics2D)g).setStroke(new BasicStroke(3));
+			drawLineInCoord(g, line[0].x, line[0].y, line[1].x, line[1].y);
+			
+			g.setColor(GRID_COLOR);
+			((Graphics2D)g).setStroke(new BasicStroke(1));
 			drawLineInCoord(g, line[0].x, line[0].y, line[1].x, line[1].y);
 		}
 	}

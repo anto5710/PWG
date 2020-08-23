@@ -9,6 +9,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.Vector;
 
+import board.ADual;
 import board.Coord;
 import board.Formation;
 import board.Team;
@@ -19,18 +20,18 @@ public class PerspectiveBoard extends FocusableBoard{
 	
 	public double vecx = 0, vecy = 0;
 	
-	public PerspectiveBoard(Formation f, Team[] teams) {
-		super(f, teams);
+	public PerspectiveBoard(ADual game) {
+		super(game);
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				whenDragged(e);
+				if(e.isShiftDown()) whenDragged(e);
 			}
 		});
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				whenPressed(e);
+				if(e.isShiftDown()) whenPressed(e);
 			}
 		});
 		
@@ -42,7 +43,18 @@ public class PerspectiveBoard extends FocusableBoard{
 	
 	public AffineTransform perspective(){
 //		return tp;
-		return AffineTransform.getRotateInstance(vecx, vecy, centerX(), centerY());
+		
+//		System.out.println(vecx +"   "+ vecy);
+		
+		
+		
+		return AffineTransform.getRotateInstance(round(vecx), round(vecy), centerX(), centerY());
+//		return AffineTransform.get
+	}
+	
+	private int round(double num){
+//		return (int) num;
+		return (int) (Math.abs(num) <= 20 ? 0 : num);
 	}
 	
 	private void whenPressed(MouseEvent e){
@@ -80,7 +92,6 @@ public class PerspectiveBoard extends FocusableBoard{
 	@Override
 	public Coord toCoord(int px, int py) {
 		Point2D src = new Point(px, py);
-		
 		
 		try {
 			src = perspective().inverseTransform(src, src);
